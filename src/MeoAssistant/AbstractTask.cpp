@@ -22,7 +22,7 @@ AbstractTask::AbstractTask(AsstCallback callback, void* callback_arg)
 
 bool asst::AbstractTask::run()
 {
-    for (int i = 0; i != m_retry_times; ++i) {
+    for (m_cur_retry = 0; m_cur_retry < m_retry_times; ++m_cur_retry) {
         if (_run()) {
             return true;
         }
@@ -65,7 +65,7 @@ bool AbstractTask::sleep(unsigned millisecond)
     return !need_exit();
 }
 
-bool AbstractTask::save_image(const cv::Mat& image, const std::string& dir)
+bool AbstractTask::save_image(const cv::Mat image, const std::string& dir)
 {
     std::filesystem::create_directory(dir);
     const std::string time_str = utils::string_replace_all(utils::string_replace_all(utils::get_format_time(), " ", "_"), ":", "-");

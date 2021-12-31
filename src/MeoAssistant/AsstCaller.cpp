@@ -1,6 +1,7 @@
 #include "AsstCaller.h"
 
 #include <string.h>
+#include <iostream>
 
 #include <meojson/json_value.h>
 
@@ -45,9 +46,13 @@ asst::Assistant* AsstCreate(const char* dirname)
     try {
         return new asst::Assistant(dirname);
     }
-    catch (...) {
-        return nullptr;
+    catch (std::exception& e) {
+        std::cerr << "create failed: " << e.what() << std::endl;
     }
+    catch (...) {
+        std::cerr << "create failed: unknown exception" << std::endl;
+    }
+    return nullptr;
 }
 
 asst::Assistant* AsstCreateEx(const char* dirname, AsstCallback callback, void* custom_arg)
@@ -112,13 +117,22 @@ bool AsstCatchFake(asst::Assistant* p_asst)
 #endif // LOG_TRACE
 }
 
-bool AsstAppendFight(asst::Assistant* p_asst, int max_mecidine, int max_stone, int max_times)
+bool ASSTAPI AsstAppendStartUp(asst::Assistant* p_asst)
 {
     if (p_asst == nullptr) {
         return false;
     }
 
-    return p_asst->append_fight(max_mecidine, max_stone, max_times);
+    return p_asst->append_start_up();
+}
+
+bool AsstAppendFight(asst::Assistant* p_asst, const char* stage, int max_mecidine, int max_stone, int max_times)
+{
+    if (p_asst == nullptr) {
+        return false;
+    }
+
+    return p_asst->append_fight(stage, max_mecidine, max_stone, max_times);
 }
 
 bool AsstAppendAward(asst::Assistant* p_asst)
@@ -176,10 +190,10 @@ bool AsstAppendInfrast(asst::Assistant* p_asst, int work_mode, const char** orde
     order_vector.assign(order, order + order_size);
 
     return p_asst->append_infrast(
-            static_cast<asst::infrast::WorkMode>(work_mode),
-            order_vector,
-            uses_of_drones,
-            dorm_threshold);
+        static_cast<asst::infrast::WorkMode>(work_mode),
+        order_vector,
+        uses_of_drones,
+        dorm_threshold);
 }
 
 bool AsstAppendRecruit(asst::Assistant* p_asst, int max_times, const int select_level[], int select_len, const int confirm_level[], int confirm_len, bool need_refresh)

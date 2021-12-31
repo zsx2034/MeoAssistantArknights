@@ -140,7 +140,7 @@ bool asst::InfrastReceptionTask::proc_vacancy()
         sleep(delay);
 
         // 识别右边列表中的线索，然后用最底下的那个（一般都是剩余时间最短的）
-        swipe_to_the_bottom_of_clue_list_on_the_right();
+        //swipe_to_the_bottom_of_clue_list_on_the_right();
         image = Ctrler.get_image();
         InfrastClueImageAnalyzer clue_analyzer(image);
         if (!clue_analyzer.analyze()) {
@@ -155,7 +155,7 @@ bool asst::InfrastReceptionTask::proc_vacancy()
 bool asst::InfrastReceptionTask::shift()
 {
     LogTraceFunction;
-    const auto& image = Ctrler.get_image();
+    const auto image = Ctrler.get_image();
     MatchImageAnalyzer add_analyzer(image);
 
     const auto raw_task_ptr = task.get("InfrastAddOperator" + m_facility + m_work_mode_name);
@@ -184,7 +184,6 @@ bool asst::InfrastReceptionTask::shift()
             return false;
         }
         click_clear_button();
-        swipe_to_the_left_of_operlist();
 
         if (!opers_detect_with_swipe()) {
             return false;
@@ -195,6 +194,7 @@ bool asst::InfrastReceptionTask::shift()
         bool ret = opers_choose();
         if (!ret) {
             m_all_available_opers.clear();
+            swipe_to_the_left_of_operlist();
             continue;
         }
         break;

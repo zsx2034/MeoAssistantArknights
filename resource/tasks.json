@@ -1,10 +1,334 @@
 ﻿{
-    "SanityBegin": {
+    "StartUp": {
         "algorithm": "justreturn",
         "action": "doNothing",
         "next": [
-            "UsePrts",
-            "StartButton1",
+            "GameStart",
+            "StartToWakeUp",
+            "Terminal",
+            "CloseAnno",
+            "TodaysSupplies",
+            "ReturnToTerminal",
+            "OfflineConfirm"
+        ]
+    },
+    "LS-5": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "StageResourceToLS5",
+            "StageLS",
+            "StageLS5"
+        ]
+    },
+    "StageResourceToLS5": {
+        "template": "StageResource.png",
+        "roi": [
+            790,
+            640,
+            60,
+            60
+        ],
+        "action": "clickSelf",
+        "next": [
+            "SwipeToStageLS"
+        ]
+    },
+    "SwipeToStageLS": {
+        "algorithm": "justReturn",
+        "action": "swipeToTheLeft",
+        "next": [
+            "StageLS"
+        ]
+    },
+    "StageLS": {
+        "action": "clickSelf",
+        "next": [
+            "StageLS5"
+        ]
+    },
+    "StageLS5": {
+        "action": "clickSelf",
+        "roi": [
+            850,
+            140,
+            250,
+            80
+        ]
+    },
+    "BI-8": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "StageBreakIceToBI8",
+            "StageBIToBI8",
+            "StageBI8"
+        ]
+    },
+    "StageBreakIceToBI8": {
+        "template": "StageBreakIce.png",
+        "roi": [
+            0,
+            500,
+            500,
+            150
+        ],
+        "maskRange": [
+            1,
+            255
+        ],
+        "action": "clickSelf",
+        "next": [
+            "StageBIToBI8"
+        ]
+    },
+    "StageBIToBI8": {
+        "template": "StageBI.png",
+        "action": "clickSelf",
+        "roi": [
+            1000,
+            250,
+            280,
+            150
+        ],
+        "cache": false,
+        "next": [
+            "SwipeToStageBI8"
+        ]
+    },
+    "SwipeToStageBI8": {
+        "algorithm": "justReturn",
+        "action": "swipeToTheRight",
+        "maxTimes": 3,
+        "exceededNext": [
+            "StageBI8"
+        ],
+        "next": [
+            "StageBI8",
+            "SwipeToStageBI8"
+        ]
+    },
+    "StageBI8": {
+        "action": "clickSelf",
+        "roi": [
+            200,
+            350,
+            200,
+            80
+        ]
+    },
+    "BI-7": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "StageBreakIceToBI7",
+            "StageBIToBI7",
+            "StageBI7"
+        ]
+    },
+    "StageBreakIceToBI7": {
+        "template": "StageBreakIce.png",
+        "roi": [
+            0,
+            500,
+            500,
+            150
+        ],
+        "maskRange": [
+            1,
+            255
+        ],
+        "action": "clickSelf",
+        "next": [
+            "StageBIToBI7"
+        ]
+    },
+    "StageBIToBI7": {
+        "template": "StageBI.png",
+        "action": "clickSelf",
+        "roi": [
+            1000,
+            250,
+            280,
+            150
+        ],
+        "cache": false,
+        "next": [
+            "SwipeToStageBI7"
+        ]
+    },
+    "SwipeToStageBI7": {
+        "algorithm": "justReturn",
+        "action": "swipeToTheRight",
+        "maxTimes": 3,
+        "exceededNext": [
+            "StageBI7"
+        ],
+        "next": [
+            "StageBI7",
+            "SwipeToStageBI7"
+        ]
+    },
+    "StageBI7": {
+        "action": "clickSelf",
+        "roi": [
+            50,
+            250,
+            200,
+            80
+        ]
+    },
+    "CA-5": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "StageResourceToCA5",
+            "StageCA",
+            "StageCA5"
+        ]
+    },
+    "StageResourceToCA5": {
+        "template": "StageResource.png",
+        "roi": [
+            790,
+            640,
+            60,
+            60
+        ],
+        "action": "clickSelf",
+        "next": [
+            "SwipeToStageCA"
+        ]
+    },
+    "SwipeToStageCA": {
+        "algorithm": "justReturn",
+        "action": "swipeToTheLeft",
+        "next": [
+            "StageCA"
+        ]
+    },
+    "StageCA": {
+        "action": "clickSelf",
+        "next": [
+            "StageCA5"
+        ]
+    },
+    "StageCA5": {
+        "action": "clickSelf",
+        "roi": [
+            850,
+            140,
+            250,
+            80
+        ]
+    },
+    "AP-5": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "StageResourceToAP5",
+            "StageAP",
+            "StageAP5"
+        ]
+    },
+    "StageResourceToAP5": {
+        "template": "StageResource.png",
+        "roi": [
+            790,
+            640,
+            60,
+            60
+        ],
+        "action": "clickSelf",
+        "next": [
+            "SwipeToStageAP"
+        ]
+    },
+    "SwipeToStageAP": {
+        "algorithm": "justReturn",
+        "action": "swipeToTheLeft",
+        "next": [
+            "StageAP"
+        ]
+    },
+    "StageAP": {
+        "action": "clickSelf",
+        "next": [
+            "StageAP5"
+        ]
+    },
+    "StageAP5": {
+        "action": "clickSelf",
+        "roi": [
+            850,
+            140,
+            250,
+            80
+        ]
+    },
+    "CE-5": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "StageResourceToCE5",
+            "StageCE",
+            "StageCE5"
+        ]
+    },
+    "StageResourceToCE5": {
+        "template": "StageResource.png",
+        "roi": [
+            790,
+            640,
+            60,
+            60
+        ],
+        "action": "clickSelf",
+        "next": [
+            "SwipeToStageCE"
+        ]
+    },
+    "SwipeToStageCE": {
+        "algorithm": "justReturn",
+        "action": "swipeToTheLeft",
+        "next": [
+            "StageCE"
+        ]
+    },
+    "StageCE": {
+        "action": "clickSelf",
+        "next": [
+            "StageCE5"
+        ]
+    },
+    "StageCE5": {
+        "action": "clickSelf",
+        "roi": [
+            850,
+            140,
+            250,
+            80
+        ]
+    },
+    "Annihilation": {
+        "doc": "剿灭作战，一般本周的满了也不会有人再刷的，所以只识别右上角ToDoList里的剿灭就可以了",
+        "template": "StageAnnihilation.png",
+        "action": "clickSelf",
+        "roi": [
+            900,
+            70,
+            380,
+            400
+        ],
+        "maskRange": [
+            1,
+            255
+        ]
+    },
+    "StageBegin": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
             "ReturnToTerminal",
             "PRTS",
             "EndOfAction",
@@ -14,6 +338,17 @@
             "CloseAnno",
             "Terminal",
             "GameStart"
+        ]
+    },
+    "FightBegin": {
+        "algorithm": "justreturn",
+        "action": "doNothing",
+        "next": [
+            "UsePrts",
+            "StartButton1",
+            "StartButton2",
+            "PRTS",
+            "EndOfAction"
         ]
     },
     "GameStart": {
@@ -112,18 +447,15 @@
     "PRTS": {
         "algorithm": "OcrDetect",
         "text": [
-            "剩余可放置角色",
-            "接管作战",
-            "代理指挥",
-            "运行中"
+            "剩余可放置角色"
         ],
         "roi": [
-            300,
-            530,
-            980,
-            190
+            900,
+            500,
+            380,
+            150
+
         ],
-        "cache": false,
         "action": "doNothing",
         "rearDelay": 5000,
         "next": [
@@ -364,7 +696,7 @@
             1100,
             0,
             180,
-            120
+            200
         ],
         "next": [
             "Terminal",
@@ -384,7 +716,8 @@
             "LastBattle",
             "Terminal",
             "CloseAnno",
-            "TodaysSupplies"
+            "TodaysSupplies",
+            "Stop"
         ]
     },
     "TodaysSupplies": {
@@ -413,8 +746,8 @@
     "LastBattle": {
         "algorithm": "OcrDetect",
         "text": [
-            "前往上",
-            "次作战"
+            "前往",
+            "作战"
         ],
         "roi": [
             900,
@@ -424,6 +757,7 @@
         ],
         "action": "clickSelf",
         "next": [
+            "UsePrts",
             "StartButton1"
         ]
     },
@@ -450,7 +784,8 @@
         "next": [
             "Recruit",
             "ReturnToRecruit",
-            "ReturnToRecruitConfirm"
+            "ReturnToRecruitConfirm",
+            "ReturnToRecruitCloseAnno"
         ]
     },
     "ReturnToRecruitConfirm": {
@@ -465,6 +800,23 @@
         ],
         "next": [
             "Recruit",
+            "ReturnToRecruit",
+            "ReturnToRecruitCloseAnno"
+        ]
+    },
+    "ReturnToRecruitCloseAnno": {
+        "template": "CloseAnno.png",
+        "action": "clickSelf",
+        "cache": false,
+        "roi": [
+            1100,
+            0,
+            180,
+            200
+        ],
+        "next": [
+            "Recruit",
+            "ReturnToRecruitCloseAnno",
             "ReturnToRecruit"
         ]
     },
@@ -664,7 +1016,8 @@
         "next": [
             "Award",
             "ReturnToAward",
-            "ReturnToAwardConfirm"
+            "ReturnToAwardConfirm",
+            "ReturnToRecruitCloseAnno"
         ]
     },
     "ReturnToAwardConfirm": {
@@ -679,6 +1032,23 @@
         ],
         "next": [
             "Award",
+            "ReturnToAward",
+            "ReturnToRecruitCloseAnno"
+        ]
+    },
+    "ReturnToAwardCloseAnno": {
+        "template": "CloseAnno.png",
+        "action": "clickSelf",
+        "cache": false,
+        "roi": [
+            1100,
+            0,
+            180,
+            200
+        ],
+        "next": [
+            "Award",
+            "ReturnToRecruitCloseAnno",
             "ReturnToAward"
         ]
     },
@@ -707,7 +1077,8 @@
         "next": [
             "Friends",
             "ReturnToFriends",
-            "ReturnToFriendsConfirm"
+            "ReturnToFriendsConfirm",
+            "ReturnToFriendsCloseAnno"
         ]
     },
     "ReturnToFriendsConfirm": {
@@ -722,7 +1093,24 @@
         ],
         "next": [
             "Friends",
-            "ReturnToFriends"
+            "ReturnToFriends",
+            "ReturnToFriendsCloseAnno"
+        ]
+    },
+    "ReturnToFriendsCloseAnno": {
+        "template": "CloseAnno.png",
+        "action": "clickSelf",
+        "cache": false,
+        "roi": [
+            1100,
+            0,
+            180,
+            200
+        ],
+        "next": [
+            "Friends",
+            "ReturnToFriends",
+            "ReturnToFriendsCloseAnno"
         ]
     },
     "Friends": {
@@ -841,7 +1229,8 @@
         "next": [
             "Mall",
             "ReturnToMallConfirm",
-            "ReturnToMall"
+            "ReturnToMall",
+            "ReturnToMallCloseAnno"
         ]
     },
     "ReturnToMallConfirm": {
@@ -856,7 +1245,24 @@
         ],
         "next": [
             "ReturnToMall",
-            "Mall"
+            "Mall",
+            "ReturnToMallCloseAnno"
+        ]
+    },
+    "ReturnToMallCloseAnno": {
+        "template": "CloseAnno.png",
+        "action": "clickSelf",
+        "cache": false,
+        "roi": [
+            1100,
+            0,
+            180,
+            200
+        ],
+        "next": [
+            "Mall",
+            "ReturnToMallCloseAnno",
+            "ReturnToMall"
         ]
     },
     "Mall": {
@@ -981,7 +1387,8 @@
         "next": [
             "HomeFlag",
             "ReturnToHome",
-            "ReturnToHomeConfirm"
+            "ReturnToHomeConfirm",
+            "ReturnToHomeCloseAnno"
         ]
     },
     "ReturnToHomeConfirm": {
@@ -996,7 +1403,24 @@
         ],
         "next": [
             "HomeFlag",
-            "ReturnToHome"
+            "ReturnToHome",
+            "ReturnToHomeCloseAnno"
+        ]
+    },
+    "ReturnToHomeCloseAnno": {
+        "template": "CloseAnno.png",
+        "action": "clickSelf",
+        "cache": false,
+        "roi": [
+            1100,
+            0,
+            180,
+            200
+        ],
+        "next": [
+            "HomeFlag",
+            "ReturnToHome",
+            "ReturnToHomeCloseAnno"
         ]
     },
     "HomeFlag": {
@@ -1090,6 +1514,10 @@
             120
         ],
         "ocrReplace": [
+            [
+                "千员",
+                "干员"
+            ],
             [
                 ".+击干员",
                 "狙击干员"
@@ -1187,7 +1615,8 @@
             "InfrastNotification",
             "InfrastEnteredFlag",
             "ReturnToInfrast",
-            "ReturnToInfrastConfirm"
+            "ReturnToInfrastConfirm",
+            "ReturnToInfrastCloseAnno"
         ]
     },
     "ReturnToInfrastConfirm": {
@@ -1205,7 +1634,25 @@
             "InfrastNotification",
             "InfrastEnteredFlag",
             "ReturnToInfrast",
-            "ReturnToInfrastConfirm"
+            "ReturnToInfrastCloseAnno"
+        ]
+    },
+    "ReturnToInfrastCloseAnno": {
+        "template": "CloseAnno.png",
+        "action": "clickSelf",
+        "cache": false,
+        "roi": [
+            1100,
+            0,
+            180,
+            200
+        ],
+        "next": [
+            "EnterInfrast",
+            "InfrastNotification",
+            "InfrastEnteredFlag",
+            "ReturnToInfrast",
+            "ReturnToInfrastCloseAnno"
         ]
     },
     "Return": {
@@ -2207,6 +2654,6 @@
             400,
             200
         ],
-        "rearDelay": 1000
+        "rearDelay": 3000
     }
 }

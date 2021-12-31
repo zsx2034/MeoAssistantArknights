@@ -28,7 +28,7 @@
 using namespace asst;
 
 Assistant::Assistant(std::string dirname, AsstCallback callback, void* callback_arg)
-    : m_dirname(std::move(dirname) + "\\"),
+    : m_dirname(std::move(dirname) + "/"),
     m_callback(callback),
     m_callback_arg(callback_arg)
 {
@@ -37,10 +37,10 @@ Assistant::Assistant(std::string dirname, AsstCallback callback, void* callback_
 
     LogTraceFunction;
 
-    bool resource_ret = Resrc.load(m_dirname + "Resource\\");
+    bool resource_ret = Resrc.load(m_dirname + "Resource/");
     if (!resource_ret) {
         const std::string& error = Resrc.get_last_error();
-        Log.error("resource broken", error);
+        Log.error("resource broken:", error);
         if (m_callback == nullptr) {
             throw error;
         }
@@ -92,7 +92,7 @@ bool Assistant::catch_emulator(const std::string& emulator_name)
     LogTraceFunction;
 
     stop();
-
+#ifdef _WIN32
     bool ret = false;
     //std::string cor_name = emulator_name;
     auto& cfg = Resrc.cfg();
@@ -116,6 +116,9 @@ bool Assistant::catch_emulator(const std::string& emulator_name)
 
     m_inited = ret;
     return ret;
+#else   // Not supported catch emulator in Linux
+    return false;
+#endif
 }
 
 bool asst::Assistant::catch_custom(const std::string& address)
@@ -150,7 +153,7 @@ bool asst::Assistant::catch_fake()
     return true;
 }
 
-bool asst::Assistant::append_fight(int mecidine, int stone, int times, bool only_append)
+bool asst::Assistant::append_start_up(bool only_append)
 {
     LogTraceFunction;
     if (!m_inited) {
@@ -160,13 +163,64 @@ bool asst::Assistant::append_fight(int mecidine, int stone, int times, bool only
     std::unique_lock<std::mutex> lock(m_mutex);
 
     auto task_ptr = std::make_shared<ProcessTask>(task_callback, (void*)this);
-    task_ptr->set_task_chain("Fight");
-    task_ptr->set_tasks({ "SanityBegin" });
-    task_ptr->set_times_limit("MedicineConfirm", mecidine);
-    task_ptr->set_times_limit("StoneConfirm", stone);
-    task_ptr->set_times_limit("StartButton1", times);
+    task_ptr->set_task_chain("StartUp");
+    task_ptr->set_tasks({ "StartUp" });
+    task_ptr->set_times_limit("ReturnToTerminal", 0);
+    task_ptr->set_times_limit("Terminal", 0);
 
     m_tasks_queue.emplace(task_ptr);
+
+    if (!only_append) {
+        return start(false);
+    }
+
+    return true;
+}
+
+bool asst::Assistant::append_fight(const std::string& stage, int mecidine, int stone, int times, bool only_append)
+{
+    LogTraceFunction;
+    if (!m_inited) {
+        return false;
+    }
+
+    constexpr const char* TaskChain = "Fight";
+
+    // 进入选关界面（主界面的“终端”点进去）
+    auto terminal_task_ptr = std::make_shared<ProcessTask>(task_callback, (void*)this);
+    terminal_task_ptr->set_task_chain(TaskChain);
+    terminal_task_ptr->set_tasks({ "StageBegin" });
+    terminal_task_ptr->set_times_limit("LastBattle", 0);
+    terminal_task_ptr->set_times_limit("StartButton1", 0);
+    terminal_task_ptr->set_times_limit("StartButton2", 0);
+    terminal_task_ptr->set_times_limit("MedicineConfirm", 0);
+    terminal_task_ptr->set_times_limit("StoneConfirm", 0);
+
+    // 进入对应的关卡
+    auto stage_task_ptr = std::make_shared<ProcessTask>(task_callback, (void*)this);
+    stage_task_ptr->set_task_chain(TaskChain);
+    stage_task_ptr->set_tasks({ stage });
+    stage_task_ptr->set_times_limit("StartButton1", 0);
+    stage_task_ptr->set_times_limit("StartButton2", 0);
+    stage_task_ptr->set_times_limit("MedicineConfirm", 0);
+    stage_task_ptr->set_times_limit("StoneConfirm", 0);
+
+    // 开始战斗任务
+    auto fight_task_ptr = std::make_shared<ProcessTask>(task_callback, (void*)this);
+    fight_task_ptr->set_task_chain(TaskChain);
+    fight_task_ptr->set_tasks({ "FightBegin" });
+    fight_task_ptr->set_times_limit("MedicineConfirm", mecidine);
+    fight_task_ptr->set_times_limit("StoneConfirm", stone);
+    fight_task_ptr->set_times_limit("StartButton1", times);
+    fight_task_ptr->set_times_limit("StartButton2", times);
+
+    std::unique_lock<std::mutex> lock(m_mutex);
+
+    if (!stage.empty()) {
+        m_tasks_queue.emplace(terminal_task_ptr);
+        m_tasks_queue.emplace(stage_task_ptr);
+    }
+    m_tasks_queue.emplace(fight_task_ptr);
 
     if (!only_append) {
         return start(false);
@@ -402,10 +456,10 @@ void asst::Assistant::set_penguin_id(const std::string& id)
 {
     auto& opt = Resrc.cfg().get_options();
     if (id.empty()) {
-        opt.penguin_report_extra_param.clear();
+        opt.penguin_report.extra_param.clear();
     }
     else {
-        opt.penguin_report_extra_param = "-H \"authorization: PenguinID " + id + "\"";
+        opt.penguin_report.extra_param = "-H \"authorization: PenguinID " + id + "\"";
     }
 }
 
@@ -442,7 +496,7 @@ bool Assistant::stop(bool block)
     decltype(m_tasks_queue) empty;
     m_tasks_queue.swap(empty);
 
-    //clear_cache();
+    clear_cache();
 
     return true;
 }
@@ -482,7 +536,7 @@ void Assistant::working_proc()
                 task_callback(AsstMsg::TaskChainCompleted, task_json, this);
             }
             if (m_tasks_queue.empty()) {
-                task_callback(AsstMsg::AllTasksCompleted, json::value(), this);
+                task_callback(AsstMsg::AllTasksCompleted, task_json, this);
             }
 
             //clear_cache();
@@ -494,6 +548,7 @@ void Assistant::working_proc()
         else {
             pre_taskchain.clear();
             m_thread_idle = true;
+            Log.flush();
             //controller.set_idle(true);
             m_condvar.wait(lock);
         }
@@ -558,7 +613,7 @@ void asst::Assistant::append_callback(AsstMsg msg, json::value detail)
 void Assistant::clear_cache()
 {
     Resrc.item().clear_drop_count();
-    task.clear_cache();
+    //task.clear_cache();
 }
 
 json::value asst::Assistant::organize_stage_drop(const json::value& rec)
@@ -581,11 +636,11 @@ json::value asst::Assistant::organize_stage_drop(const json::value& rec)
         info["count"] = count;
         statistics_vec.emplace_back(std::move(info));
     }
-    // 排个序，数量多的放前面
-    std::sort(statistics_vec.begin(), statistics_vec.end(),
-        [](const json::value& lhs, const json::value& rhs) -> bool {
-            return lhs.at("count").as_integer() > rhs.at("count").as_integer();
-        });
+    //// 排个序，数量多的放前面
+    //std::sort(statistics_vec.begin(), statistics_vec.end(),
+    //    [](const json::value& lhs, const json::value& rhs) -> bool {
+    //        return lhs.at("count").as_integer() > rhs.at("count").as_integer();
+    //    });
 
     dst["statistics"] = json::array(std::move(statistics_vec));
 

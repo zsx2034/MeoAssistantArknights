@@ -54,7 +54,7 @@ bool asst::InfrastProductionTask::shift_facility_list()
         sleep(tab_task_ptr->rear_delay);
 
         /* 识别当前制造/贸易站有没有添加干员按钮，没有就不换班 */
-        const auto& image = Ctrler.get_image();
+        const auto image = Ctrler.get_image();
         add_analyzer.set_image(image);
         if (!add_analyzer.analyze()) {
             Log.info("no add button, just continue");
@@ -91,13 +91,6 @@ bool asst::InfrastProductionTask::shift_facility_list()
         set_product(cur_product);
         Log.info("cur product", cur_product);
 
-        // 使用无人机
-        if (cur_product == m_uses_of_drones) {
-            if (use_drone()) {
-                m_uses_of_drones = "_Used";
-            }
-        }
-
         locked_analyzer.set_image(image);
         if (locked_analyzer.analyze()) {
             m_cur_num_of_lokced_opers = locked_analyzer.get_result().size();
@@ -115,7 +108,6 @@ bool asst::InfrastProductionTask::shift_facility_list()
                 return false;
             }
             click_clear_button();
-            swipe_to_the_left_of_operlist(2);
 
             if (m_all_available_opers.empty()) {
                 if (!opers_detect_with_swipe()) {
@@ -130,11 +122,19 @@ bool asst::InfrastProductionTask::shift_facility_list()
             bool ret = opers_choose();
             if (!ret) {
                 m_all_available_opers.clear();
+                swipe_to_the_left_of_operlist(2);
                 continue;
             }
             break;
         }
         click_confirm_button();
+
+        // 使用无人机
+        if (cur_product == m_uses_of_drones) {
+            if (use_drone()) {
+                m_uses_of_drones = "_Used";
+            }
+        }
     }
     return true;
 }
@@ -176,7 +176,7 @@ bool asst::InfrastProductionTask::opers_detect_with_swipe()
 size_t asst::InfrastProductionTask::opers_detect()
 {
     LogTraceFunction;
-    const auto& image = Ctrler.get_image();
+    const auto image = Ctrler.get_image();
 
     InfrastOperImageAnalyzer oper_analyzer(image);
     oper_analyzer.set_facility(m_facility);
@@ -452,7 +452,7 @@ bool asst::InfrastProductionTask::opers_choose()
         if (need_exit()) {
             return false;
         }
-        const auto& image = Ctrler.get_image();
+        const auto image = Ctrler.get_image();
 
         InfrastOperImageAnalyzer oper_analyzer(image);
         oper_analyzer.set_facility(m_facility);
@@ -602,7 +602,7 @@ bool asst::InfrastProductionTask::facility_list_detect()
     LogTraceFunction;
     m_facility_list_tabs.clear();
 
-    const auto& image = Ctrler.get_image();
+    const auto image = Ctrler.get_image();
     MultiMatchImageAnalyzer mm_analyzer(image);
 
     const auto task_ptr = std::dynamic_pointer_cast<MatchTaskInfo>(

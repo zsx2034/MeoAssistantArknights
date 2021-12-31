@@ -15,7 +15,10 @@ namespace asst
     class Logger
     {
     public:
-        ~Logger() = default;
+        ~Logger()
+        {
+            flush();
+        }
 
         Logger(const Logger&) = delete;
         Logger(Logger&&) = delete;
@@ -48,6 +51,13 @@ namespace asst
         {
             std::string_view level = "ERR";
             log(level, std::forward<Args>(args)...);
+        }
+        void flush()
+        {
+            std::unique_lock<std::mutex> trace_lock(m_trace_mutex);
+            if (m_ofs.is_open()) {
+                m_ofs.close();
+            }
         }
 
         const std::string m_log_filename = m_dirname + "asst.log";
@@ -90,18 +100,33 @@ namespace asst
         {
             std::unique_lock<std::mutex> trace_lock(m_trace_mutex);
 
-            char buff[128] = { 0 };
-            sprintf_s(buff, "[%s][%s][Px%x][Tx%x]",
+            constexpr int buff_len = 128;
+            char buff[buff_len] = { 0 };
+#ifdef _WIN32
+#ifdef _MSC_VER
+            sprintf_s(buff, buff_len,
+#else   // ! _MSC_VER
+            sprintf(buff,
+#endif  // END _MSC_VER
+            "[%s][%s][Px%x][Tx%x]",
                       asst::utils::get_format_time().c_str(),
-                      level.data(), _getpid(), ::GetCurrentThreadId());
+                      level.data(), _getpid(), ::GetCurrentThreadId()
+            );
+#else   // ! _WIN32
+            sprintf(buff, "[%s][%s][Px%x][Tx%x]",
+                      asst::utils::get_format_time().c_str(),
+                      level.data(), getpid(), gettid()
+            );
+#endif  // END _WIN32
 
-            std::ofstream ofs(m_log_filename, std::ios::out | std::ios::app);
+            if (!m_ofs.is_open()) {
+                m_ofs = std::ofstream(m_log_filename, std::ios::out | std::ios::app);
+            }
 #ifdef LOG_TRACE
-            stream_args(ofs, buff, args...);
+            stream_args(m_ofs, buff, args...);
 #else
-            stream_args(ofs, buff, std::forward<Args>(args)...);
+            stream_args(m_ofs, buff, std::forward<Args>(args)...);
 #endif
-            ofs.close();
 
 #ifdef LOG_TRACE
             stream_args<true>(std::cout, buff, std::forward<Args>(args)...);
@@ -133,12 +158,17 @@ namespace asst
         {
             inline void operator()(std::ostream& os, T&& first)
             {
+#ifdef _WIN32
                 os << utils::utf8_to_gbk(first) << " ";
+#else
+                os << first << " "; // Don't fucking use gbk in linux
+#endif
             }
         };
 
         inline static std::string m_dirname;
         std::mutex m_trace_mutex;
+        std::ofstream m_ofs;
     };
 
     class LoggerAux

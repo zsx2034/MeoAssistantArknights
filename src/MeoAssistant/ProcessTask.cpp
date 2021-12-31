@@ -46,7 +46,7 @@ bool ProcessTask::_run()
             task_info_ptr = front_task_ptr;
         }
         else {
-            const auto& image = Ctrler.get_image();
+            const auto image = Ctrler.get_image();
             ProcessTaskImageAnalyzer analyzer(image, m_cur_tasks_name);
             if (!analyzer.analyze()) {
                 return false;
@@ -81,6 +81,7 @@ bool ProcessTask::_run()
         if (auto iter = m_times_limit.find(task_info_ptr->name);
             iter != m_times_limit.cend()) {
             max_times = iter->second;
+            callback_json["times_limit"] = max_times;
         }
 
         if (exec_times >= max_times) {
@@ -133,17 +134,18 @@ bool ProcessTask::_run()
             m_callback(AsstMsg::StageDrops, json::parse(res).value(), m_callback_arg);
 
             auto& opt = Resrc.cfg().get_options();
-            if (opt.print_window) {
-                //static const std::string dirname = utils::get_cur_dir() + "screenshot\\";
-                //save_image(image, dirname);
-            }
-            if (opt.penguin_report) {
+            //if (opt.print_window) {
+            //    //static const std::string dirname = utils::get_cur_dir() + "screenshot\\";
+            //    //save_image(image, dirname);
+            //}
+            if (opt.penguin_report.enable) {
                 PenguinUploader::upload(res);
             }
         } break;
         default:
             break;
         }
+        m_cur_retry = 0;
 
         ++exec_times;
 
